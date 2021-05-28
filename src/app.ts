@@ -12,6 +12,7 @@ async function scrapePage(url: string) {
     await page.screenshot({
         path: `./debugScreenshots/screenshot${Math.floor(Date.now() / 1000)}.png`
     });
+
     sleep(10000).then(() => {});
 
     //get latest video URL
@@ -25,7 +26,7 @@ async function scrapePage(url: string) {
     const date = await elDate.getProperty('innerHTML')
     const dateTxt = await date.jsonValue();
 
-    logic(latestUrl, dateTxt)
+    magicFunction(latestUrl, dateTxt)
 
     sleep(8000).then(() => {
         saveInfoToFile(latestUrl, dateTxt)
@@ -34,11 +35,10 @@ async function scrapePage(url: string) {
     await browser.close();
 }
 
-function sleep(ms: number) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
 
-async function logic(url: string, date: string) {
+
+
+async function magicFunction(url: string, date: string) {
 
     var path = './log'
     fs.readFile(`${path}/latest.json`, 'utf8', function read(err, data) {
@@ -49,46 +49,52 @@ async function logic(url: string, date: string) {
         let jsonData = JSON.parse(data)
 
 
-        if (url == jsonData.url) {
+        if (jsonData.url != url) {
 
-            //console.log("old content")
+            //console.log('new video 001')
 
-            if (date.split(" ")[0] == "Premieredato") {
-
-                //console.log('I cant post this, this video is still not live 0003')
+            if (jsonData.date.split(" ")[0] == "Premieredato") {
+                //console.log('premiering 002')
+                saveStateToFile("no")
 
             } else {
-
-                if (jsonData.posted == 'no') {
-
-                    webhook(url)
-                    saveStateToFile('yes')
-
-                } else {
-
-                    //console.log("This video should have been posted")
-
-                }
-            }
-
-        } else {
-
-            //console.log("new content")
-
-            if (date.split(" ")[0] == "for") {
-
+                //console.log('posting video 003')
                 webhook(url)
                 saveStateToFile('yes')
-
-            } else {
-
-                //console.log('I cant post this, this video is still not live 0004')
+                sleep(6000).then(() => {});
 
             }
 
+        } else if (jsonData.url == url) {
+
+
+            if (jsonData.posted == "no") {
+
+                if (jsonData.date.split(" ")[0] == "Premieredato") {
+                    //console.log('premiering 004')
+                    saveStateToFile("no")
+                    sleep(6000).then(() => {});
+    
+                } else {
+    
+                    //console.log('posting video 005')
+                    webhook(url)
+                    saveStateToFile('yes')
+                    sleep(6000).then(() => {});
+    
+                }
+
+
+            } else if (jsonData.posted == "yes") {
+
+                //console.log('Video already posted 006')
+
+            }
 
 
         }
+
+
 
     })
 
@@ -158,4 +164,9 @@ async function webhook(url: string) {
     });
 }
 
-scrapePage('https://consent.youtube.com/m?continue=https%3A%2F%2Fwww.youtube.com%2Fuser%2FlinustEchtips%2Fvideos&gl=NO&m=0&pc=yt&uxe=23983172&hl=en-GB&src=1')
+function sleep(ms: number) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+//scrapePage('https://consent.youtube.com/m?continue=https%3A%2F%2Fwww.youtube.com%2Fuser%2Flinustechtips%2Fvideos&gl=NO&m=0&pc=yt&uxe=23983172&hl=en-GB&src=1')
+scrapePage('https://consent.youtube.com/m?continue=https%3A%2F%2Fwww.youtube.com%2Fuser%2FDuplexRecords%2Fvideos&gl=NO&m=0&pc=yt&uxe=23983172&hl=en-GB&src=1')
