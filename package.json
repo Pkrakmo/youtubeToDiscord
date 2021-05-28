@@ -1,0 +1,21 @@
+{
+  "name": "youtubetodiscord",
+  "version": "1.0.0",
+  "description": "Post the latest youtube video to Discord",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^15.6.1",
+    "@types/puppeteer": "^5.4.3"
+  },
+  "dependencies": {
+    "dotenv": "^10.0.0",
+    "node-fetch": "^2.6.1",
+    "puppeteer": "^9.1.1",
+    "request": "^2.88.2"
+  }
+}
