@@ -15,6 +15,19 @@ fs.mkdir(path, function (ErrnoException) {
     }
 })
 
+fs.mkdir('./debugScreenshots', function (ErrnoException) {
+    if (ErrnoException) {
+        if (ErrnoException.code == 'EEXIST') {
+            console.log('Directory exists already');
+        } else {
+            console.log('failed to create directory');
+            return console.error(ErrnoException);
+        }
+    } else {
+    
+    }
+})
+
 let data = {
     "url": "placeholder.com",
     "date": "ages ago",
