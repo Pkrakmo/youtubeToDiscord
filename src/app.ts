@@ -136,16 +136,18 @@ async function saveInfoToFile(url: string, date: string, views: string) {
 
 async function saveStateToFile(state: string) {
 
-
     fs.readFile(`./log/latest.json`, 'utf8', function read(err, data) {
         if (err) {
             return console.log(err);
         }
 
+        var today = new Date();
+        var dateAndTime = today.toLocaleString('no-NB');
 
         let jsonData = JSON.parse(data)
 
         jsonData.posted = state;
+        jsonData.timePostedtoDiscord = dateAndTime
 
         let jsonToJson = JSON.stringify(jsonData)
 
@@ -203,8 +205,6 @@ async function webhook(dataString: string) {
     });
 }
 
-
-
 async function webhookDebug(dataString: string) {
     const whurl = process.env.WEBHOOKDEBUG;
     const msg = {
@@ -220,13 +220,7 @@ async function webhookDebug(dataString: string) {
 
 }
 
-
-
-
 var ytChannalname = 'DuplexRecords'
 var ytUrl = `https://consent.youtube.com/m?continue=https%3A%2F%2Fwww.youtube.com%2Fuser%2F${ytChannalname}%2Fvideos&gl=NO&m=0&pc=yt&uxe=23983172&hl=en-GB&src=1`
-
-
-
 
 scrapePage(ytUrl)
