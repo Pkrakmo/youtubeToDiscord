@@ -1,8 +1,6 @@
 import fs from 'fs';
 
-var path = './log'
-
-fs.mkdir(path, function (ErrnoException) {
+fs.mkdir('./log', function (ErrnoException) {
     if (ErrnoException) {
         if (ErrnoException.code == 'EEXIST') {
             console.log('Directory exists already');
@@ -28,15 +26,21 @@ fs.mkdir('./debugScreenshots', function (ErrnoException) {
     }
 })
 
+
+var today = new Date();
+var dateAndTime = today.toLocaleString('no-NB');
+
 let data = {
     "url": "placeholder.com",
     "date": "ages ago",
-    "posted": "no"
+    "views": "Sett 234k ganger",
+    "posted": "no",
+    "timePostedtoDiscord": `${dateAndTime}`
 }
 
 let jsonData = JSON.stringify(data)
 
-fs.writeFile(`${path}/latest.json`, `${jsonData}`, function (err) {
+fs.writeFile(`./log/latest.json`, `${jsonData}`, function (err) {
     if (err) {
         return console.log(err);
     }
