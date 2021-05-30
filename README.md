@@ -4,6 +4,7 @@ Script that will get the latest youtube video from a spesific channel and post i
 .ENV variables:
 
 WEBHOOK=[URL]
+
 WEBHOOKDEBUG=[URL]
 
 WEBHOOKDEBUG is optional, but required if const debugMode: boolean = true
