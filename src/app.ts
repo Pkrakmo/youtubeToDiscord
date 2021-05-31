@@ -79,7 +79,8 @@ async function magicFunction(url: string, date: string, views: string) {
         let afterPremierArray = ["for", "Strømmet", "StrÃ¸mmet"]
 
         if (jsonData.url == "") {
-            debugData(url, date, views, 'missing URL in JSON-file or unable to read 000')         
+            debugData(url, date, views, 'missing URL in JSON-file or unable to read 000')
+            debugCopyFile()         
         } else {
             if (jsonData.url != url) {
                 //001
@@ -176,6 +177,23 @@ async function saveStateToFile(state: string) {
 }
 
 
+/**
+ * Copies ./log/latest.json if something went wrong
+ * Creates a new file named ./log/latest{UNIXtimestamp}.json
+ */
+async function debugCopyFile() {
+
+    fs.copyFile("./log/latest.json", `./log/latest${Math.floor(Date.now() / 1000)}.json`, (err) => {
+        if (err) {
+          console.log("Error Found:", err);
+        }
+        else {
+            webhookDebug(`file copied !`)
+        }
+      });
+}
+
+
 
 function sleep(ms: number) {
     return new Promise(resolve => setTimeout(resolve, ms));
@@ -226,7 +244,6 @@ async function osChecker() {
     }
 }
 
-
 function scriptExecuter() {
     if (process.argv[2] == null) {
         console.log("missing argument(s)")
@@ -237,7 +254,6 @@ function scriptExecuter() {
         scrapePage(ytUrl)
     }
 }
-
 
 async function debugData(url: string, date: string, views: string, consoleLogMessage: string) {
 
