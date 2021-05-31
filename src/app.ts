@@ -78,32 +78,39 @@ async function magicFunction(url: string, date: string, views: string) {
         let dateWord: string = date.split(" ")[0]
         let afterPremierArray = ["for", "Strømmet", "StrÃ¸mmet"]
 
-        if (jsonData.url != url) {
-            //001
-            if (foundWord) {
-                debugData(url, date, views, 'premiering or streaming 002 via new url 001')
-                saveStateToFile("no")
-            } else if (afterPremierArray.includes(dateWord)) {
-                debugData(url, date, views, 'posting video 003 via new url 001')
-                webhook(url)
-                saveStateToFile("yes")
-            }
-
-        } else if (jsonData.url == url) {
-            //004
-            if (foundWord) {
-                debugData(url, date, views, 'premiering or streaming 005 via old url 004')
-                saveStateToFile("no")
-            } else if (afterPremierArray.includes(dateWord)) {
-                if (jsonData.posted == "yes") {
-                    debugData(url, date, views, 'already posted 006 via old url 004')
-                } else {
-                    debugData(url, date, views, 'posting video 007 via old url 004')
+        if (jsonData.url == "") {
+            webhookDebug("URL missing form JSON-file, will skip for now")            
+        } else {
+            if (jsonData.url != url) {
+                //001
+                if (foundWord) {
+                    debugData(url, date, views, 'premiering or streaming 002 via new url 001')
+                    saveStateToFile("no")
+                } else if (afterPremierArray.includes(dateWord)) {
+                    debugData(url, date, views, 'posting video 003 via new url 001')
                     webhook(url)
                     saveStateToFile("yes")
                 }
+    
+            } else if (jsonData.url == url) {
+                //004
+                if (foundWord) {
+                    debugData(url, date, views, 'premiering or streaming 005 via old url 004')
+                    saveStateToFile("no")
+                } else if (afterPremierArray.includes(dateWord)) {
+                    if (jsonData.posted == "yes") {
+                        debugData(url, date, views, 'already posted 006 via old url 004')
+                    } else {
+                        debugData(url, date, views, 'posting video 007 via old url 004')
+                        webhook(url)
+                        saveStateToFile("yes")
+                    }
+                }
             }
         }
+        
+        
+
     })
 }
 
