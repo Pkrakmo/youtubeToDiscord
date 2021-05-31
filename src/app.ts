@@ -31,7 +31,7 @@ async function scrapePage(url: string) {
     const [elDate] = await page.$x('//*[@id="metadata-line"]/span[2]')
     const date = await elDate.getProperty('innerHTML')
     const dateTxt: string = await date!.jsonValue();
-    
+
     //get premier date/views
     const [elViews] = await page.$x('//*[@id="metadata-line"]/span[1]')
     const views = await elViews.getProperty('innerHTML')
@@ -168,32 +168,7 @@ async function saveStateToFile(state: string) {
     })
 }
 
-const debugMode: boolean = true
-async function debugData(url: string, date: string, views: string, consoleLogMessage: string) {
 
-    var today = new Date();
-    var dateAndTime = today.toLocaleString('no-NB');
-
-
-    switch (debugMode) {
-        case true:
-
-            fs.readFile(`./log/latest.json`, 'utf8', function read(err, data) {
-                if (err) {
-                    return console.log(err);
-                }
-
-                let jsonData = JSON.parse(data)
-
-                webhookDebug(`Run time of debug: ${dateAndTime} \nJSON-data from file:\nURL: ${jsonData.url} \nDate: ${jsonData.date} \nViews: ${jsonData.views} \nPosted: ${jsonData.posted} \nTimePosted: ${jsonData.timePostedtoDiscord}  \n\nData pulled from scrape, before saved to file:\nURL: ${url} \nDate: ${date} \nViews: ${views}  \nConsoleLogMessage: ${consoleLogMessage}`)
-            })
-
-            break;
-
-        default:
-            break;
-    }
-}
 
 function sleep(ms: number) {
     return new Promise(resolve => setTimeout(resolve, ms));
@@ -229,7 +204,7 @@ async function webhookDebug(dataString: string) {
 }
 
 async function osChecker() {
-    
+
     if (os.type() == "Windows_NT") {
         return puppeteer.launch({
             headless: true,
@@ -240,17 +215,41 @@ async function osChecker() {
             headless: true,
             executablePath: '/usr/bin/chromium-browser',
             args: ['--no-sandbox', '--disable-setuid-sandbox']
-        });   
+        });
     }
 }
 
 
+function scriptExecuter() {
+    if (process.argv[2] == null) {
+        console.log("missing argument(s)")
+    } else {
+        var ytChannalname = process.argv[2]
+        var ytUrl = `https://consent.youtube.com/m?continue=https%3A%2F%2Fwww.youtube.com%2Fuser%2F${ytChannalname}%2Fvideos&gl=NO&m=0&pc=yt&uxe=23983172&hl=en-GB&src=1`
+
+        scrapePage(ytUrl)
+    }
+}
 
 
+async function debugData(url: string, date: string, views: string, consoleLogMessage: string) {
 
-var ytChannalname = 'DuplexRecords'
-var ytUrl = `https://consent.youtube.com/m?continue=https%3A%2F%2Fwww.youtube.com%2Fuser%2F${ytChannalname}%2Fvideos&gl=NO&m=0&pc=yt&uxe=23983172&hl=en-GB&src=1`
+    var today = new Date();
+    var dateAndTime = today.toLocaleString('no-NB');
 
-scrapePage(ytUrl)
+    if (process.argv[3] == null) {
+    } else if (process.argv[3] == "debug") {
 
+        fs.readFile(`./log/latest.json`, 'utf8', function read(err, data) {
+            if (err) {
+                return console.log(err);
+            }
 
+            let jsonData = JSON.parse(data)
+
+            webhookDebug(`Run time of debug: ${dateAndTime} \nJSON-data from file:\nURL: ${jsonData.url} \nDate: ${jsonData.date} \nViews: ${jsonData.views} \nPosted: ${jsonData.posted} \nTimePosted: ${jsonData.timePostedtoDiscord}  \n\nData pulled from scrape, before saved to file:\nURL: ${url} \nDate: ${date} \nViews: ${views}  \nConsoleLogMessage: ${consoleLogMessage}`)
+        })
+    }
+}
+
+scriptExecuter()
