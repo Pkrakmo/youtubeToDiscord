@@ -1,6 +1,7 @@
 import fs from 'fs';
 import puppeteer from 'puppeteer';
 import fetch from 'node-fetch';
+import os from 'os';
 require('dotenv').config();
 
 
@@ -15,11 +16,7 @@ require('dotenv').config();
  */
 async function scrapePage(url: string) {
 
-    const browser = await puppeteer.launch({
-        headless: true,
-        //executablePath: '/usr/bin/chromium-browser',
-        args: ['--no-sandbox', '--disable-setuid-sandbox']
-    });
+    const browser = await osChecker()
 
     const page = await browser.newPage()
 
@@ -34,7 +31,7 @@ async function scrapePage(url: string) {
     const [elDate] = await page.$x('//*[@id="metadata-line"]/span[2]')
     const date = await elDate.getProperty('innerHTML')
     const dateTxt: string = await date!.jsonValue();
-
+    
     //get premier date/views
     const [elViews] = await page.$x('//*[@id="metadata-line"]/span[1]')
     const views = await elViews.getProperty('innerHTML')
@@ -110,6 +107,12 @@ async function magicFunction(url: string, date: string, views: string) {
     })
 }
 
+/**
+ * Will send the paramteres and write it to an local JSON-file
+ * @param {string} url - Video url
+ * @param {string} date - Video upload date or Premierdate
+ * @param {string} views - Current Views, Waiting or Premierdate
+ */
 async function saveInfoToFile(url: string, date: string, views: string) {
 
     fs.readFile(`./log/latest.json`, 'utf8', function read(err, data) {
@@ -134,6 +137,11 @@ async function saveInfoToFile(url: string, date: string, views: string) {
     })
 }
 
+/**
+ * Will send the paramteres and write it to an local JSON-file
+ * it will also save date and time to the JSON-file, subject to change
+ * @param {string} state - is it posted yes/no
+ */
 async function saveStateToFile(state: string) {
 
     fs.readFile(`./log/latest.json`, 'utf8', function read(err, data) {
@@ -220,7 +228,29 @@ async function webhookDebug(dataString: string) {
 
 }
 
+async function osChecker() {
+    
+    if (os.type() == "Windows_NT") {
+        return puppeteer.launch({
+            headless: true,
+            args: ['--no-sandbox', '--disable-setuid-sandbox']
+        });
+    } else {
+        return puppeteer.launch({
+            headless: true,
+            executablePath: '/usr/bin/chromium-browser',
+            args: ['--no-sandbox', '--disable-setuid-sandbox']
+        });   
+    }
+}
+
+
+
+
+
 var ytChannalname = 'DuplexRecords'
 var ytUrl = `https://consent.youtube.com/m?continue=https%3A%2F%2Fwww.youtube.com%2Fuser%2F${ytChannalname}%2Fvideos&gl=NO&m=0&pc=yt&uxe=23983172&hl=en-GB&src=1`
 
 scrapePage(ytUrl)
+
+
