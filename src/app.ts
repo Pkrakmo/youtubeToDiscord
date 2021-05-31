@@ -79,7 +79,7 @@ async function magicFunction(url: string, date: string, views: string) {
         let afterPremierArray = ["for", "Strømmet", "StrÃ¸mmet"]
 
         if (jsonData.url == "") {
-            webhookDebug("URL missing form JSON-file, will skip for now")            
+            debugData(url, date, views, 'missing URL in JSON-file or unable to read 000')         
         } else {
             if (jsonData.url != url) {
                 //001
