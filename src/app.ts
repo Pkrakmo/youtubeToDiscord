@@ -37,14 +37,16 @@ async function scrapePage(url: string) {
     const views = await elViews.getProperty('innerHTML')
     const viewsTxt: string = await views!.jsonValue();
 
+    //will sleep for 4 seconds before executing the comparison logic
     sleep(4000).then(() => {
         magicFunction(latestUrl, dateTxt, viewsTxt)
     });
 
-    await browser.close();
+    //will sleep for 10 seconds before saving data to file (subject to change)
     sleep(10000).then(() => {
         saveInfoToFile(latestUrl, dateTxt, viewsTxt)
     });
+    await browser.close();
 
 }
 
@@ -57,7 +59,7 @@ async function scrapePage(url: string) {
  */
 async function magicFunction(url: string, date: string, views: string) {
 
-    fs.readFile(`./log/latest.json`, 'utf8', function read(err, data) {
+    fs.readFile(`./log/${process.argv[2]}-data.json`, 'utf8', function read(err, data) {
         if (err) {
             return console.log(err);
         }
@@ -69,9 +71,13 @@ async function magicFunction(url: string, date: string, views: string) {
         let premierWordTwo: string = date.split(" ")[1]
         let premierWordThree: string = views.split(" ")[0]
 
+        //array of the variables above
         let premierWordArray = [premierWordOne, premierWordTwo, premierWordThree]
+
+        //array of the possible variables for Premiering video or streaming
         let premierArray = ["Premieredato", "venter", "ser"]
 
+        //will compare Array premierWordArray against Array premierArray too see if the video is Premiering or is a livestream
         let foundWord: boolean = premierWordArray.some(arr => premierArray.includes(arr))
 
         //Items for checking if an video is posted or done streaming/premiering
@@ -79,11 +85,20 @@ async function magicFunction(url: string, date: string, views: string) {
         let afterPremierArray = ["for", "Strømmet", "StrÃ¸mmet"]
 
         if (jsonData.url == "") {
+            /**
+             * This is more of a debug feature as there have been some occurance where the video URL have been missing from the JSON-file
+             * this might get removed later
+             */
             debugData(url, date, views, 'missing URL in JSON-file or unable to read 000')
             debugCopyFile()         
         } else {
             if (jsonData.url != url) {
-                //001
+                /**
+                 * 001
+                 * This part will be triggered if the URL does not match the URL in the JSON aka there is a new video
+                 * 002 And it will then check if the video is Premiering or a livestream, if so it will not be posted
+                 * 003 If the video is not Premiering or a livestream it will be posted and then marked as posted as 006 will prevent it
+                 */
                 if (foundWord) {
                     debugData(url, date, views, 'premiering or streaming 002 via new url 001')
                     saveStateToFile("no")
@@ -94,7 +109,15 @@ async function magicFunction(url: string, date: string, views: string) {
                 }
     
             } else if (jsonData.url == url) {
-                //004
+                /**
+                 * 004
+                 * This part will be triggered if the URL does match with the URL in the JSON
+                 * This does occure if the video was livestreaming or Premiering on the scan when the video
+                 * was added to the selected channal
+                 * 005 It will then check if the video is Premiering or a livestream,if so it will not be posted
+                 * 006 If the video is already posted it will not be posted
+                 * 007 If the video is not a Premiering or a livestream and it has not been posted before it will be posted
+                 */
                 if (foundWord) {
                     debugData(url, date, views, 'premiering or streaming 005 via old url 004')
                     saveStateToFile("no")
@@ -123,7 +146,10 @@ async function magicFunction(url: string, date: string, views: string) {
  */
 async function saveInfoToFile(url: string, date: string, views: string) {
 
-    fs.readFile(`./log/latest.json`, 'utf8', function read(err, data) {
+    let ChannalName = process.argv[2]
+    let ChannalNameLowerCase = ChannalName.toLowerCase()
+    
+    fs.readFile(`./log/${ChannalNameLowerCase}-data.json`, 'utf8', function read(err, data) {
         if (err) {
             return console.log(err);
         }
@@ -136,7 +162,7 @@ async function saveInfoToFile(url: string, date: string, views: string) {
 
         let jsonToJson = JSON.stringify(jsonData)
 
-        fs.writeFile(`./log/latest.json`, `${jsonToJson}`, function (err) {
+        fs.writeFile(`./log/${ChannalNameLowerCase}-data.json`, `${jsonToJson}`, function (err) {
             if (err) {
                 return console.log(err);
             }
@@ -152,7 +178,10 @@ async function saveInfoToFile(url: string, date: string, views: string) {
  */
 async function saveStateToFile(state: string) {
 
-    fs.readFile(`./log/latest.json`, 'utf8', function read(err, data) {
+    let ChannalName = process.argv[2]
+    let ChannalNameLowerCase = ChannalName.toLowerCase()
+
+    fs.readFile(`./log/${ChannalNameLowerCase}-data.json`, 'utf8', function read(err, data) {
         if (err) {
             return console.log(err);
         }
@@ -167,7 +196,7 @@ async function saveStateToFile(state: string) {
 
         let jsonToJson = JSON.stringify(jsonData)
 
-        fs.writeFile(`./log/latest.json`, `${jsonToJson}`, function (err) {
+        fs.writeFile(`./log/${ChannalNameLowerCase}-data.json`, `${jsonToJson}`, function (err) {
             if (err) {
                 return console.log(err);
             }
@@ -176,14 +205,16 @@ async function saveStateToFile(state: string) {
     })
 }
 
-
 /**
  * Copies ./log/latest.json if something went wrong
  * Creates a new file named ./log/latest{UNIXtimestamp}.json
  */
 async function debugCopyFile() {
 
-    fs.copyFile("./log/latest.json", `./log/latest${Math.floor(Date.now() / 1000)}.json`, (err) => {
+    let ChannalName = process.argv[2]
+    let ChannalNameLowerCase = ChannalName.toLowerCase()
+
+    fs.copyFile(`./log/${ChannalNameLowerCase}-data.json`, `./log/${ChannalNameLowerCase}-data${Math.floor(Date.now() / 1000)}.json`, (err) => {
         if (err) {
           console.log("Error Found:", err);
         }
@@ -193,8 +224,10 @@ async function debugCopyFile() {
       });
 }
 
-
-
+/**
+ * Function for trying to delay some operations
+ * @param {number} ms - time given in ms
+ */
 function sleep(ms: number) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
@@ -213,6 +246,10 @@ async function webhook(dataString: string) {
     });
 }
 
+/**
+ * Own webhook function for debugging, subject to change
+ * @param {string} dataString - will send the input to webhook target
+ */
 async function webhookDebug(dataString: string) {
     const whurl = process.env.WEBHOOKDEBUG;
     const msg = {
@@ -227,7 +264,10 @@ async function webhookDebug(dataString: string) {
     });
 
 }
-
+/**
+ * @returns will change what properties puppeteer.launch() will use,
+ * this was to fix issues running puppeteer on Linux
+ */
 async function osChecker() {
 
     if (os.type() == "Windows_NT") {
@@ -243,10 +283,16 @@ async function osChecker() {
         });
     }
 }
-
+/**
+ * Executes the whole flow by using the first arugment
+ * ex: node .\dist\app.js DuplexRecords
+*/
 function scriptExecuter() {
+
+
+
     if (process.argv[2] == null) {
-        console.log("missing argument(s)")
+        console.log("missing argument(s), please provide a channal name")
     } else {
         var ytChannalname = process.argv[2]
         var ytUrl = `https://consent.youtube.com/m?continue=https%3A%2F%2Fwww.youtube.com%2Fuser%2F${ytChannalname}%2Fvideos&gl=NO&m=0&pc=yt&uxe=23983172&hl=en-GB&src=1`
@@ -255,22 +301,32 @@ function scriptExecuter() {
     }
 }
 
+/**
+ * Executes the whole debug flow by using the first arugment
+ * ex: node .\dist\app.js DuplexRecords debug
+*/
 async function debugData(url: string, date: string, views: string, consoleLogMessage: string) {
 
     var today = new Date();
     var dateAndTime = today.toLocaleString('no-NB');
 
-    if (process.argv[3] == null) {
-    } else if (process.argv[3] == "debug") {
+    let debugArg = process.argv[3]
+    let debugArgLowerCase = debugArg.toLowerCase()
 
-        fs.readFile(`./log/latest.json`, 'utf8', function read(err, data) {
+    let ChannalName = process.argv[2]
+    let ChannalNameLowerCase = ChannalName.toLowerCase()
+
+    if (debugArgLowerCase == null) {
+    } else if (debugArgLowerCase == "debug") {
+
+        fs.readFile(`./log/${ChannalNameLowerCase}-data.json`, 'utf8', function read(err, data) {
             if (err) {
                 return console.log(err);
             }
 
             let jsonData = JSON.parse(data)
 
-            webhookDebug(`Run time of debug: ${dateAndTime} \nJSON-data from file:\nURL: ${jsonData.url} \nDate: ${jsonData.date} \nViews: ${jsonData.views} \nPosted: ${jsonData.posted} \nTimePosted: ${jsonData.timePostedtoDiscord}  \n\nData pulled from scrape, before saved to file:\nURL: ${url} \nDate: ${date} \nViews: ${views}  \nConsoleLogMessage: ${consoleLogMessage}`)
+            webhookDebug(`Run time of debug: ${dateAndTime}\nChannalName: ${ChannalNameLowerCase} \nJSON-data from file:\nURL: ${jsonData.url} \nDate: ${jsonData.date} \nViews: ${jsonData.views} \nPosted: ${jsonData.posted} \nTimePosted: ${jsonData.timePostedtoDiscord}  \n\nData pulled from scrape, before saved to file:\nURL: ${url} \nDate: ${date} \nViews: ${views}  \nConsoleLogMessage: ${consoleLogMessage}`)
         })
     }
 }
