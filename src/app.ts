@@ -4,8 +4,6 @@ import fetch from 'node-fetch';
 import os from 'os';
 require('dotenv').config();
 
-
-
 /**
  * Will scrape the video youtube page with the help of @see {@link https://pptr.dev/} will only work on URLs like this:
  * https://www.youtube.com/user/username/videos
