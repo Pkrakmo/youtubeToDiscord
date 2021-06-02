@@ -3,10 +3,16 @@ import fs from 'fs';
 function mainRunner() {
 
     if (process.argv[2] == null) {
-        console.log("missing argument(s), please provide a channal name")
+        console.log("missing argument, please provide a channel url, ex https://www.youtube.com/c/LinusTechTips")
+    } else if (arraylenghtChecker() <= 4) {
+        console.log("invalid url, please provide a channel url, ex https://www.youtube.com/c/LinusTechTips")
+    } else if (arraylenghtChecker() >= 6) {
+        console.log("invalid url, please provide a channel url, ex https://www.youtube.com/c/LinusTechTips it might so simple that there is an / on the end")
     } else {
-        let ChannalName = process.argv[2]
-        let ChannalNameLowerCase = ChannalName.toLowerCase()
+
+        var urlFix = urlCheck()
+        var urlArr = urlFix.split("/")
+        var ChannelName = urlArr[urlArr.length - 1].toLowerCase()
 
         fs.mkdir('./log', function (ErrnoException) {
             if (ErrnoException) {
@@ -34,12 +40,12 @@ function mainRunner() {
             }
         })
 
-
         var today = new Date();
         var dateAndTime = today.toLocaleString('no-NB');
 
         let data = {
             "url": "placeholder.com",
+            "channelUrl": `${urlFix}/videos/`,
             "date": "ages ago",
             "views": "Sett 234k ganger",
             "posted": "no",
@@ -48,7 +54,7 @@ function mainRunner() {
 
         let jsonData = JSON.stringify(data)
 
-        fs.writeFile(`./log/${ChannalNameLowerCase}-data.json`, `${jsonData}`, function (err) {
+        fs.writeFile(`./log/${ChannelName}-data.json`, `${jsonData}`, function (err) {
             if (err) {
                 return console.log(err);
             }
@@ -56,6 +62,27 @@ function mainRunner() {
         })
 
     }
+}
+
+function arraylenghtChecker() {
+
+    var url = process.argv[2]
+    var urlArr = url.split("/")
+    return urlArr.length
+
+}
+
+function urlCheck() {
+
+    var url = process.argv[2]
+    var urlFix = url.charAt(url.length - 1)
+
+    if (urlFix == "/") {
+        return url.slice(0, -1)
+    } else {
+        return url
+    }
+
 }
 
 mainRunner()

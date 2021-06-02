@@ -2,11 +2,6 @@
 Script that will get the latest youtube video from a spesific channel and post it to Discord via their Webhook
 I have tested this on Windows 10 and Raspberry Pi OS
 
-This will only work on channels with [Legacy username](https://support.google.com/youtube/answer/6180214?hl=en) URL as of now
-Looking into how this can be solved
-
-
-
 # Setup / Running
 
 ## Installation guide
@@ -28,19 +23,29 @@ ENV variables needed
 | ------ | ------ |
 | WEBHOOK | Discord webhook url|
 | WEBHOOKDEBUG | Discord webhook url |
+
+## Compile
+
+* To run this scrip you need to compile the the typescript files into usable javascript files
+
+```sh
+tsc
+```
+
+* a new folder named dist will apear with the javascript-files that you need
   
 ## Setup
   
 * I have set it up so that you only need to feed it arguments
 * First we need some folders, and a data file for storing information
-* arguments accepted: channalname (required)
+* arguments accepted: url (required) (NB: It is important that )
 
 ```sh
-node .\dist\init.js channalname 
+node .\dist\init.js channal/user URL
 ```
 Example: 
 ```sh
-node .\dist\init.js linustechtips
+node .\dist\init.js https://www.youtube.com/c/LinusTechTips
 ```
 
 This will create a folder in the root of the working directory

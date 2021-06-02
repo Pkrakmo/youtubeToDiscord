@@ -22,6 +22,20 @@ async function scrapePage(url: string) {
 
     await page.goto(url);
 
+    const [button] = await page.$x('//*[@id="yDmH0d"]/c-wiz/div/div/div/div[2]/div[1]/div[4]/form/div[1]/div/button');
+
+    if (button) {
+        await button.click();
+    }
+
+    //await page.screenshot({ path: `./debugScreenshots/ScreenshotBeforeClick${Math.floor(Date.now() / 1000)}.png` });
+
+    await page.waitForXPath('//*[@id="logo"]', {
+        visible: true
+    })
+
+    //await page.screenshot({ path: `./debugScreenshots/ScreenshotAfterClick${Math.floor(Date.now() / 1000)}.png` });
+
     //get latest video URL
     const [ellatest] = await page.$x('//*[@id="thumbnail"]')
     const latest = await ellatest.getProperty('href')
@@ -90,7 +104,7 @@ async function magicFunction(url: string, date: string, views: string) {
              * this might get removed later
              */
             debugData(url, date, views, 'missing URL in JSON-file or unable to read 000')
-            debugCopyFile()         
+            debugCopyFile()
         } else {
             if (jsonData.url != url) {
                 /**
@@ -107,7 +121,7 @@ async function magicFunction(url: string, date: string, views: string) {
                     webhook(url)
                     saveStateToFile("yes")
                 }
-    
+
             } else if (jsonData.url == url) {
                 /**
                  * 004
@@ -132,8 +146,8 @@ async function magicFunction(url: string, date: string, views: string) {
                 }
             }
         }
-        
-        
+
+
 
     })
 }
@@ -148,7 +162,7 @@ async function saveInfoToFile(url: string, date: string, views: string) {
 
     let ChannalName = process.argv[2]
     let ChannalNameLowerCase = ChannalName.toLowerCase()
-    
+
     fs.readFile(`./log/${ChannalNameLowerCase}-data.json`, 'utf8', function read(err, data) {
         if (err) {
             return console.log(err);
@@ -216,12 +230,11 @@ async function debugCopyFile() {
 
     fs.copyFile(`./log/${ChannalNameLowerCase}-data.json`, `./log/${ChannalNameLowerCase}-data${Math.floor(Date.now() / 1000)}.json`, (err) => {
         if (err) {
-          console.log("Error Found:", err);
-        }
-        else {
+            console.log("Error Found:", err);
+        } else {
             webhookDebug(`file copied !`)
         }
-      });
+    });
 }
 
 /**
@@ -286,38 +299,40 @@ async function osChecker() {
 /**
  * Executes the whole flow by using the first arugment
  * ex: node .\dist\app.js DuplexRecords
-*/
+ */
 function scriptExecuter() {
 
 
+    let ChannalName = process.argv[2]
+    let ChannalNameLowerCase = ChannalName.toLowerCase()
 
-    if (process.argv[2] == null) {
-        console.log("missing argument(s), please provide a channal name")
-    } else {
-        var ytChannalname = process.argv[2]
-        var ytUrl = `https://consent.youtube.com/m?continue=https%3A%2F%2Fwww.youtube.com%2Fuser%2F${ytChannalname}%2Fvideos&gl=NO&m=0&pc=yt&uxe=23983172&hl=en-GB&src=1`
+    fs.readFile(`./log/${ChannalNameLowerCase}-data.json`, 'utf8', function read(err, data) {
+        if (err) {
+            return console.log("File does not exisit, did you run COMMAND HERE");
+        } 
 
-        scrapePage(ytUrl)
-    }
+        let jsonData = JSON.parse(data)
+        scrapePage(jsonData.channelUrl)
+
+    })
+
 }
 
 /**
  * Executes the whole debug flow by using the first arugment
  * ex: node .\dist\app.js DuplexRecords debug
-*/
+ */
 async function debugData(url: string, date: string, views: string, consoleLogMessage: string) {
 
     var today = new Date();
     var dateAndTime = today.toLocaleString('no-NB');
 
     let debugArg = process.argv[3]
-    let debugArgLowerCase = debugArg.toLowerCase()
 
     let ChannalName = process.argv[2]
     let ChannalNameLowerCase = ChannalName.toLowerCase()
 
-    if (debugArgLowerCase == null) {
-    } else if (debugArgLowerCase == "debug") {
+    if (debugArg == null) {} else if (debugArg.toLowerCase() == "debug") {
 
         fs.readFile(`./log/${ChannalNameLowerCase}-data.json`, 'utf8', function read(err, data) {
             if (err) {
