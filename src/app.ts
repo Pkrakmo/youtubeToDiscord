@@ -15,10 +15,11 @@ require('dotenv').config();
 async function scrapePage(url: string) {
 
     const browser = await osChecker()
-
     const page = await browser.newPage()
 
     await page.goto(url);
+
+    // Youtube consent bit
 
     const [button] = await page.$x('//*[@id="yDmH0d"]/c-wiz/div/div/div/div[2]/div[1]/div[4]/form/div[1]/div/button');
 
@@ -96,14 +97,16 @@ async function magicFunction(url: string, date: string, views: string) {
         let dateWord: string = date.split(" ")[0]
         let afterPremierArray = ["for", "Strømmet", "StrÃ¸mmet"]
 
-        if (jsonData.url == "") {
-            /**
-             * This is more of a debug feature as there have been some occurance where the video URL have been missing from the JSON-file
-             * this might get removed later
-             */
-            debugData(url, date, views, 'missing URL in JSON-file or unable to read 000')
+        if (url == "") {
+            debugData(url, date, views, 'No URL from scraping, stopping proccess')
             debugCopyFile()
-        } else {
+            throw new Error("No URL from scraping, stopping proccess")
+        } else if (jsonData.url == "") {
+            debugData(url, date, views, 'No URL from JSON-file, stopping proccess')
+            debugCopyFile()
+            throw new Error("No URL from JSON-file, stopping proccess")
+        } else{
+
             if (jsonData.url != url) {
                 /**
                  * 001
@@ -275,6 +278,7 @@ async function webhookDebug(dataString: string) {
     });
 
 }
+
 /**
  * @returns will change what properties puppeteer.launch() will use,
  * this was to fix issues running puppeteer on Linux
@@ -294,6 +298,7 @@ async function osChecker() {
         });
     }
 }
+
 /**
  * Executes the whole flow by using the first arugment
  * ex: node .\dist\app.js DuplexRecords
@@ -306,7 +311,7 @@ function scriptExecuter() {
 
     fs.readFile(`./log/${ChannalNameLowerCase}-data.json`, 'utf8', function read(err, data) {
         if (err) {
-            return console.log("File does not exisit, did you run COMMAND HERE");
+            return console.log("File does not exisit, did you run the init.js file first ? example: node .\dist\init.js https://www.youtube.com/c/LinusTechTips");
         } 
 
         let jsonData = JSON.parse(data)

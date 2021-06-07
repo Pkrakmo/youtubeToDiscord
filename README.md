@@ -32,7 +32,7 @@ ENV variables needed
 tsc
 ```
 
-* a new folder named dist will apear with the javascript-files that you need
+* a new folder named dist will appear with the javascript-files that you need
   
 ## Setup
   
