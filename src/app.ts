@@ -325,7 +325,7 @@ function scriptExecuter() {
  * Executes the whole debug flow by using the first arugment
  * ex: node .\dist\app.js DuplexRecords debug
  */
-async function debugData(url: string, date: string, views: string, consoleLogMessage: string) {
+async function debugData(url: string, date: string, views: string, debugMessage: string) {
 
     var today = new Date();
     var dateAndTime = today.toLocaleString('no-NB');
@@ -344,7 +344,7 @@ async function debugData(url: string, date: string, views: string, consoleLogMes
 
             let jsonData = JSON.parse(data)
 
-            webhookDebug(`Run time of debug: ${dateAndTime}\nChannalName: ${ChannalNameLowerCase} \nJSON-data from file:\nURL: ${jsonData.url} \nDate: ${jsonData.date} \nViews: ${jsonData.views} \nPosted: ${jsonData.posted} \nTimePosted: ${jsonData.timePostedtoDiscord}  \n\nData pulled from scrape, before saved to file:\nURL: ${url} \nDate: ${date} \nViews: ${views}  \nConsoleLogMessage: ${consoleLogMessage}`)
+            webhookDebug(`Run time of debug: ${dateAndTime}\nChannalName: ${ChannalNameLowerCase} \nJSON-data from file:\nURL: ${jsonData.url} \nDate: ${jsonData.date} \nViews: ${jsonData.views} \nPosted: ${jsonData.posted} \nTimePosted: ${jsonData.timePostedtoDiscord}  \n\nData pulled from scrape, before saved to file:\nURL: ${url} \nDate: ${date} \nViews: ${views}  \nDebugLogMessage: ${debugMessage}`)
         })
     }
 }

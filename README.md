@@ -1,5 +1,6 @@
 # youtubeToDiscord
 Script that will get the latest youtube video from a spesific channel and post it to Discord via their Webhook
+
 I have tested this on Windows 10 and Raspberry Pi OS
 
 # Setup / Running
@@ -72,8 +73,7 @@ node .\dist\app.js linustechtips debug
 
 ## Making it work on a Raspberry Pi
 
-* this script uses puppeteer that needs chromeium installed, but it needs to be installed manually on Raspberry Pi OS [Source: Puppeteer on Raspberry Pi OS NodeJS
-](https://samiprogramming.medium.com/puppeteer-on-raspbian-nodejs-3425ccea470e)
+* this script uses puppeteer that needs chromeium installed, but it needs to be installed manually on Raspberry Pi OS: [Source: Puppeteer on Raspberry Pi OS NodeJS](https://samiprogramming.medium.com/puppeteer-on-raspbian-nodejs-3425ccea470e)
 
 ```sh
 sudo apt install chromium-browser chromium-codecs-ffmpeg
@@ -81,14 +81,14 @@ sudo apt install chromium-browser chromium-codecs-ffmpeg
 
 * Since I am a total n00b I do not use complete paths, so this will cause issues trying to run it on RPi, but using bash-files are the workaround for now
 
-```sh
+```bash
 #!/bin/bash
 cd /home/pi/projects/youtubeToDiscord/
 node dist/app.js linustechtips debug
 ```
 * here is an example of how I check mulitple channels:
 
-```sh
+```bash
 #!/bin/bash
 cd /home/pi/projects/youtubeToDiscord/
 node dist/app.js linustechtips debug
